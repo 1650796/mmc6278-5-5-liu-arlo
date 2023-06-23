@@ -10,7 +10,7 @@ router
       res.json(inventory)
 
     } catch (err) {
-      res.json(404).send("Error")
+      res.status(404).send("Error")
     }
   })
   // The response should look like:
