@@ -4,6 +4,16 @@ const db = require('./db')
 router
   .route('/inventory')
   // TODO: Create a GET route that returns a list of everything in the inventory table
+  .get(async (req, res) => {
+    try {
+      const [inventory] = await db.query(`SELECT * FROM inventory`)
+      res.json(inventory)
+
+    } catch (err) {
+      res.json(404).send("Error")
+    }
+    })
+
   // The response should look like:
   // [
   //   {
@@ -17,16 +27,54 @@ router
   //   {...},
   //   {...}, etc
   // ]
-
+  
   // TODO: Create a POST route that inserts inventory items
-  // This route will accept price, quantity, name, image, and description as JSON
-  // in the request body.
-  // It should return a 204 status code
+  .post(async (req, res) => {
+    try {
+      // This route will accept price, quantity, name, image, and description as JSON
+      // in the request body.
+      const {
+        price,
+        quantity,
+        name,
+        image,
+        description
+      } = req.body
+
+      if (!(
+        price &&
+        quantity &&
+        name &&
+        image &&
+        description
+      ))
+        return res
+        .status(400)
+        .send('Must include price, quantity, name, image, and description')
+
+        await db.query(`
+        INSERT INTO inventory (price, quantity, name, image, description)
+        VALUES (?, ?, ?, ?, ?)
+        `, [price, quantity, name, image, description])
+
+      // It should return a 204 status code
+      res.status(204).end()
+
+      return
+    } catch (err) {
+      res.status(500).send('Error adding item to inventory: ' + err.message)
+    }
+  })
+  
+
 
 router
   .route('/inventory/:id')
   // TODO: Write a GET route that returns a single item from the inventory
   // that matches the id from the route parameter
+  .get(async (req, res) => {
+  
+  })
   // Should return 404 if no item is found
   // The response should look like:
   // {
